@@ -134,8 +134,8 @@ pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutc
 fn tcp_connect(addr: IpAddr, port: u16) -> Result<(TcpStream, Duration), TtfbError> {
     let addr_w_port = (addr, port);
     let now = Instant::now();
-    let mut tcp = TcpStream::connect(addr_w_port).map_err(TtfbError::CantConnectTcp)?;
-    tcp.flush().map_err(TtfbError::OtherStreamError)?;
+    let mut tcp = TcpStream::connect(addr_w_port).unwrap();
+    tcp.flush().unwrap();
     let tcp_connect_duration = now.elapsed();
     Ok((tcp, tcp_connect_duration))
 }
@@ -153,7 +153,7 @@ fn tls_handshake_if_necessary(
             .danger_accept_invalid_hostnames(allow_insecure_certificates)
             .danger_accept_invalid_certs(allow_insecure_certificates)
             .build()
-            .map_err(TtfbError::CantConnectTls)?;
+            .unwrap();
         let now = Instant::now();
         // hostname not used for DNS, only for certificate validation
         // can also be a IP address, because Certificates can have the IP-Address in
@@ -161,8 +161,8 @@ fn tls_handshake_if_necessary(
         let certificate_host = url.host_str().unwrap_or("");
         let mut stream = tls
             .connect(certificate_host, tcp)
-            .map_err(TtfbError::CantVerifyTls)?;
-        stream.flush().map_err(TtfbError::OtherStreamError)?;
+            .unwrap();
+        stream.flush().unwrap();
         let tls_handshake_duration = now.elapsed();
         Ok((Box::new(stream), Some(tls_handshake_duration)))
     } else {
@@ -179,13 +179,13 @@ fn execute_http_get(
     let header = build_http11_header(url);
     let now = Instant::now();
     tcp.write_all(header.as_bytes())
-        .map_err(TtfbError::CantConnectHttp)?;
-    tcp.flush().map_err(TtfbError::OtherStreamError)?;
+        .unwrap();
+    tcp.flush().unwrap();
     let get_request_send_duration = now.elapsed();
     let mut one_byte_buf = [0_u8];
     let now = Instant::now();
     tcp.read_exact(&mut one_byte_buf)
-        .map_err(TtfbError::CantConnectHttp)?;
+        .unwrap();
     let http_ttfb_duration = now.elapsed();
 
     // todo can lead to error, not every server responds with EOF
@@ -279,7 +279,7 @@ fn resolve_dns(url: &Url) -> Result<(IpAddr, Duration), TtfbError> {
     // probably the DNS implementation/OS has a DNS cache
     let response = resolver
         .lookup_ip(url.host_str().unwrap())
-        .map_err(|err| TtfbError::CantResolveDns(ResolveDnsError::Other(Box::new(err))))?;
+        .unwrap();
     let duration = begin.elapsed();
 
     let ipv4_addrs = response

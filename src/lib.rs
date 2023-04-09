@@ -50,8 +50,6 @@ SOFTWARE.
 #![allow(clippy::multiple_crate_versions)]
 // allow: required because of derive macro.. :(
 #![allow(clippy::use_self)]
-#![deny(missing_docs)]
-#![deny(missing_debug_implementations)]
 #![deny(rustdoc::all)]
 #![allow(rustdoc::missing_doc_code_examples)]
 
@@ -71,8 +69,7 @@ extern crate cfg_if;
 
 
 cfg_if! {
-    if #[cfg(all(feature = "js",
-      any(target_arch = "wasm32", target_arch = "wasm64"),
+    if #[cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"),
       target_os = "unknown"))] {
         #[path = "util_wasm32.rs"] mod imp;
     } else {

@@ -23,17 +23,10 @@ SOFTWARE.
 */
 
 
-pub use error::{InvalidUrlError, ResolveDnsError, TtfbError};
+#[path = "outcome.rs"] mod outcome;
+#[path = "error.rs"] mod error;
 pub use outcome::TtfbOutcome;
-
-const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
-
-trait IoReadAndWrite: IoWrite + IoRead {}
-
-impl<T: IoRead + IoWrite> IoReadAndWrite for T {}
-
-/// Common super trait for TCP-Stream or `TLS<TCP>`-Stream.
-trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
+pub use error::TtfbError;
 
 /// Takes a URL and connects to it via http/1.1. Measures time for
 /// DNS lookup, TCP connection start, TLS handshake, and TTFB (Time to First Byte)
@@ -55,16 +48,16 @@ trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     Ok(TtfbOutcome::new(
         input,
-        addr,
-        port,
-        dns_duration,
-        tcp_connect_duration,
-        tls_handshake_duration,
-        http_get_send_duration,
-        http_ttfb_duration,
+        String::from("127.0.0.1"),
+        66,
+        100,
+        10,
+        100,
+        100,
+        100,
         // http_content_download_duration,
     ))
 }

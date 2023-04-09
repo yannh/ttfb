@@ -25,6 +25,8 @@ required-features = ["bin"]
 [features]
 bin = ["clap", "crossterm"]
 
+[dependencies]
+cfg-if = "1"
 
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
 wasm-bindgen = { version = "0.2.62", default-features = false, optional = true }
@@ -41,8 +43,6 @@ derive_more = { version = "0.99", default-features = false, features = ["display
 # nice abstraction of URL
 url = "2.2"
 regex = "1.5"
-# Platform-specific includes
-cfg-if = "1"
 
 
 
