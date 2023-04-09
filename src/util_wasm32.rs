@@ -22,11 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use crate::error::TtfbError;
+use crate::outcome::TtfbOutcome;
 
-#[path = "error.rs"] pub mod error;
-#[path = "outcome.rs"] pub mod outcome;
-
-use outcome::TtfbOutcome;
 /// Takes a URL and connects to it via http/1.1. Measures time for
 /// DNS lookup, TCP connection start, TLS handshake, and TTFB (Time to First Byte)
 /// of HTML content.
@@ -47,7 +45,7 @@ use outcome::TtfbOutcome;
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<outcome::TtfbOutcome, error::TtfbError> {
+pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     Ok(TtfbOutcome::new(
         input,
         String::from("127.0.0.1"),

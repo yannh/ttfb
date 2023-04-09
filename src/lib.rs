@@ -53,7 +53,12 @@ SOFTWARE.
 #![deny(rustdoc::all)]
 // #![allow(rustdoc::missing_doc_code_examples)]
 
-pub use self::imp::error::{InvalidUrlError, ResolveDnsError};
+
+
+pub mod error;
+pub mod outcome;
+use crate::error::{InvalidUrlError, ResolveDnsError, TtfbError};
+use crate::outcome::TtfbOutcome;
 
 #[macro_use]
 extern crate cfg_if;
@@ -88,6 +93,6 @@ cfg_if! {
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<imp::outcome::TtfbOutcome, imp::error::TtfbError> {
+pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     return imp::ttfb(input, allow_insecure_certificates);
 }

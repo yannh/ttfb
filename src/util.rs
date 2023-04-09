@@ -55,8 +55,8 @@ SOFTWARE.
 #![deny(rustdoc::all)]
 #![allow(rustdoc::missing_doc_code_examples)]
 
-use error::{InvalidUrlError, ResolveDnsError, TtfbError};
-use outcome::TtfbOutcome;
+use crate::error::{InvalidUrlError, ResolveDnsError, TtfbError};
+use crate::outcome::TtfbOutcome;
 
 use native_tls::TlsConnector;
 use regex::Regex;
@@ -67,8 +67,6 @@ use std::time::{Duration, Instant};
 use trust_dns_resolver::Resolver as DnsResolver;
 use url::Url;
 
-#[path = "error.rs"] pub mod error;
-#[path = "outcome.rs"] pub mod outcome;
 
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -99,7 +97,7 @@ trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<outcome::TtfbOutcome, error::TtfbError> {
+pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     if input.is_empty() {
         return Err(TtfbError::InvalidUrl(InvalidUrlError::MissingInput));
     }

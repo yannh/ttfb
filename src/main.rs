@@ -29,8 +29,9 @@ use crossterm::ExecutableCommand;
 use std::io::stdout;
 use std::process::exit;
 
-use ttfb::imp;
 
+use ttfb::error::TtfbError;
+use ttfb::outcome::TtfbOutcome;
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 macro_rules! unwrap_or_exit {
@@ -69,7 +70,7 @@ fn main() {
     print_outcome(&ttfb).unwrap();
 }
 
-fn exit_error(err: imp::error::TtfbError) -> ! {
+fn exit_error(err: TtfbError) -> ! {
     eprint!("\u{1b}[31m");
     eprint!("\u{1b}[1m");
     eprint!("ERROR: ",);
@@ -79,7 +80,7 @@ fn exit_error(err: imp::error::TtfbError) -> ! {
     exit(-1)
 }
 
-fn print_outcome(ttfb: &imp::outcome::TtfbOutcome) -> Result<(), String> {
+fn print_outcome(ttfb: &TtfbOutcome) -> Result<(), String> {
     stdout()
         .execute(SetAttribute(Attribute::Bold))
         .map_err(|err| err.to_string())?;
