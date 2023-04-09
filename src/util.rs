@@ -55,8 +55,8 @@ SOFTWARE.
 #![deny(rustdoc::all)]
 #![allow(rustdoc::missing_doc_code_examples)]
 
-pub use error::{InvalidUrlError, ResolveDnsError, TtfbError};
-pub use outcome::TtfbOutcome;
+use error::{InvalidUrlError, ResolveDnsError, TtfbError};
+use outcome::TtfbOutcome;
 
 use native_tls::TlsConnector;
 use regex::Regex;
@@ -67,8 +67,8 @@ use std::time::{Duration, Instant};
 use trust_dns_resolver::Resolver as DnsResolver;
 use url::Url;
 
-#[path = "error.rs"] mod error;
-#[path = "outcome.rs"] mod outcome;
+#[path = "error.rs"] pub mod error;
+#[path = "outcome.rs"] pub mod outcome;
 
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -99,7 +99,7 @@ trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<outcome::TtfbOutcome, error::TtfbError> {
     if input.is_empty() {
         return Err(TtfbError::InvalidUrl(InvalidUrlError::MissingInput));
     }
@@ -121,11 +121,11 @@ pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutc
         input,
         addr.to_string(),
         port,
-        u32::try_from(dns_duration.unwrap().as_millis()).unwrap(),
-        u32::try_from(tcp_connect_duration.as_millis()).unwrap(),
-        u32::try_from(tls_handshake_duration.unwrap().as_millis()).unwrap(),
-        u32::try_from(http_get_send_duration.as_millis()).unwrap(),
-        u32::try_from(http_ttfb_duration.as_millis()).unwrap(),
+        dns_duration.unwrap().as_millis(),
+        tcp_connect_duration.as_millis(),
+        tls_handshake_duration.unwrap().as_millis(),
+        http_get_send_duration.as_millis(),
+        http_ttfb_duration.as_millis(),
         // http_content_download_duration,
     ))
 }

@@ -22,25 +22,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //! Module for [`TtfbError`].
-
+use derive_more::Display;
 /// Errors during DNS resolving.
-#[derive(Debug)]
+#[allow(missing_docs)]
+#[derive(Debug, Display)]
 pub enum ResolveDnsError {
     /// Can't find DNS entry for the given host.
+    #[display(fmt = "Can't find DNS entry for the given host.")]
     NoResults,
     /// Couldn't resolve DNS for given host.
+    #[display(fmt = "Couldn't resolve DNS for given host because!")]
     Other,
 }
 
-#[derive(Debug)]
+#[allow(missing_docs)]
+#[derive(Debug, Display)]
 pub enum InvalidUrlError {
     /// No input was provided. Provide a URL, such as <https://example.com> or <https://1.2.3.4:443>.
+    #[display(
+      fmt = "No input was provided. Provide a URL, such as https://example.com or https://1.2.3.4:443"
+    )]
     MissingInput,
     /// The URL is illegal.
+    #[display(fmt = "The URL is illegal because!")]
     WrongFormat(String),
     /// This tools only supports http and https.
+    #[display(fmt = "This tools only supports http and https.")]
     WrongScheme,
     /// Other unknown error.
+    #[display(fmt = "Other unknown error.")]
     Other,
 }
 

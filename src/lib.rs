@@ -51,29 +51,19 @@ SOFTWARE.
 // allow: required because of derive macro.. :(
 #![allow(clippy::use_self)]
 #![deny(rustdoc::all)]
-#![allow(rustdoc::missing_doc_code_examples)]
+// #![allow(rustdoc::missing_doc_code_examples)]
 
-pub use error::{InvalidUrlError, ResolveDnsError, TtfbError};
-pub use outcome::TtfbOutcome;
-
-use std::io::{Read as IoRead, Write as IoWrite};
-
-mod error;
-mod outcome;
-
-/// Common super trait for TCP-Stream or `TLS<TCP>`-Stream.
-trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
+pub use self::imp::error::{InvalidUrlError, ResolveDnsError};
 
 #[macro_use]
 extern crate cfg_if;
 
-
 cfg_if! {
     if #[cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"),
       target_os = "unknown"))] {
-        #[path = "util_wasm32.rs"] mod imp;
+        #[path = "util_wasm32.rs"] pub mod imp;
     } else {
-      #[path = "util.rs"] mod imp;
+      #[path = "util.rs"] pub mod imp;
     }
 }
 
@@ -98,6 +88,6 @@ cfg_if! {
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<imp::TtfbOutcome, imp::TtfbError> {
+pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<imp::outcome::TtfbOutcome, imp::error::TtfbError> {
     return imp::ttfb(input, allow_insecure_certificates);
 }

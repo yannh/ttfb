@@ -19,14 +19,13 @@ documentation = "https://docs.rs/ttfb"
 
 [[bin]]
 name = "ttfb"
-required-features = ["bin"]
 
-# Feature for all additional dependencies of the binary.
-[features]
-bin = ["clap", "crossterm"]
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 cfg-if = "1"
+derive_more = { version = "0.99", default-features = false, features = ["display"] }
 
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
 wasm-bindgen = { version = "0.2.62", default-features = false, optional = true }
@@ -38,25 +37,11 @@ js-sys = { version = "0.3", optional = true }
 trust-dns-resolver = { version = "0.22", features = ["dns-over-rustls"] }
 # TLS handshake
 native-tls = "0.2"
-# automatic Display impl for enums
-derive_more = { version = "0.99", default-features = false, features = ["display"] }
 # nice abstraction of URL
 url = "2.2"
 regex = "1.5"
-
-
-
-# +++ BINARY +++
-# used for the binary, not the lib
-[dependencies.crossterm]
-optional = true
-version = "0.25"
-
-# CLI args parsing
-[dependencies.clap]
-optional = true
-version = "~4.1"
-features = [
+crossterm = { version = "0.25" }
+clap = { version = "~4.1", features = [
     "std",
     "color",
     "help",
@@ -66,7 +51,5 @@ features = [
     "derive",
     "unicode",
     "wrap_help"
-]
+]}
 
-[lib]
-crate-type = ["cdylib", "rlib"]

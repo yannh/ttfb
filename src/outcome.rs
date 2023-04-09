@@ -33,16 +33,16 @@ pub struct TtfbOutcome {
     /// The port.
     port: u16,
     /// If DNS was required, the relative duration of this operation.
-    dns_duration_rel: u32,
+    dns_duration_rel: u128,
     /// Relative duration of the TCP connection start.
-    tcp_connect_duration_rel: u32,
+    tcp_connect_duration_rel: u128,
     /// If https is used, the relative duration of the TLS handshake.
-    tls_handshake_duration_rel: u32,
+    tls_handshake_duration_rel: u128,
     /// The relative duration of the HTTP GET request sending.
-    http_get_send_duration_rel: u32,
+    http_get_send_duration_rel: u128,
     /// The relative duration until the first byte from the HTTP response (the header) was
     /// received.
-    http_ttfb_duration_rel: u32,
+    http_ttfb_duration_rel: u128,
     // http_content_download_duration: Duration,
 }
 
@@ -52,11 +52,11 @@ impl TtfbOutcome {
         user_input: String,
         ip_addr: String,
         port: u16,
-        dns_duration_rel: u32,
-        tcp_connect_duration_rel: u32,
-        tls_handshake_duration_rel: u32,
-        http_get_send_duration_rel: u32,
-        http_ttfb_duration_rel: u32,
+        dns_duration_rel: u128,
+        tcp_connect_duration_rel: u128,
+        tls_handshake_duration_rel: u128,
+        http_get_send_duration_rel: u128,
+        http_ttfb_duration_rel: u128,
         // http_content_download_duration: Duration,
     ) -> Self {
         Self {
@@ -88,52 +88,52 @@ impl TtfbOutcome {
     }
 
     /// Getter for [`Self::dns_duration_rel`] (relative time).
-    pub const fn dns_duration_rel(&self) -> u32 {
+    pub const fn dns_duration_rel(&self) -> u128 {
         self.dns_duration_rel
     }
 
     /// Getter for [`Self::tcp_connect_duration_rel`] (relative time).
-    pub const fn tcp_connect_duration_rel(&self) -> u32 {
+    pub const fn tcp_connect_duration_rel(&self) -> u128 {
         self.tcp_connect_duration_rel
     }
 
     /// Getter for [`Self::tls_handshake_duration_rel`] (relative time).
-    pub const fn tls_handshake_duration_rel(&self) -> u32 {
+    pub const fn tls_handshake_duration_rel(&self) -> u128 {
         self.tls_handshake_duration_rel
     }
 
     /// Getter for [`Self::http_get_send_duration_rel`] (relative time).
-    pub const fn http_get_send_duration_rel(&self) -> u32 {
+    pub const fn http_get_send_duration_rel(&self) -> u128 {
         self.http_get_send_duration_rel
     }
 
     /// Getter for [`Self::http_ttfb_duration_rel`] (relative time).
-    pub const fn http_ttfb_duration_rel(&self) -> u32 {
+    pub const fn http_ttfb_duration_rel(&self) -> u128 {
         self.http_ttfb_duration_rel
     }
 
     /// Getter for the absolute duration from the beginning to the TCP connect.
     /// Calculated by the relative TCP connect time + DNS relative times.
-    pub fn tcp_connect_duration_abs(&self) -> u32 {
+    pub fn tcp_connect_duration_abs(&self) -> u128 {
         self.dns_duration_rel
             + self.tcp_connect_duration_rel
     }
     /// Getter for the absolute duration from the beginning to the TLS handshake.
     /// Calculated by the relative TLS handshake time + all previous relative times.
-    pub fn tls_handshake_duration_abs(&self) -> u32 {
+    pub fn tls_handshake_duration_abs(&self) -> u128 {
         self.tls_handshake_duration_rel
     }
 
     /// Getter for the absolute duration from the beginning to the HTTP GET send.
     /// Calculated by the relative HTTP GET send time + all previous relative times.
-    pub fn http_get_send_duration_abs(&self) -> u32 {
+    pub fn http_get_send_duration_abs(&self) -> u128 {
         self.tls_handshake_duration_abs()
             + self.http_get_send_duration_rel
     }
 
     /// Getter for the absolute duration from the beginning to the TTFB.
     /// Calculated by the relative TTFB time + all previous relative times.
-    pub fn http_ttfb_duration_abs(&self) -> u32 {
+    pub fn http_ttfb_duration_abs(&self) -> u128 {
         self.http_ttfb_duration_rel + self.http_get_send_duration_abs()
     }
 

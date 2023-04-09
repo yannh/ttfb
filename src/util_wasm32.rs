@@ -23,11 +23,10 @@ SOFTWARE.
 */
 
 
-#[path = "outcome.rs"] mod outcome;
-#[path = "error.rs"] mod error;
-pub use outcome::TtfbOutcome;
-pub use error::TtfbError;
+#[path = "error.rs"] pub mod error;
+#[path = "outcome.rs"] pub mod outcome;
 
+use outcome::TtfbOutcome;
 /// Takes a URL and connects to it via http/1.1. Measures time for
 /// DNS lookup, TCP connection start, TLS handshake, and TTFB (Time to First Byte)
 /// of HTML content.
@@ -48,7 +47,7 @@ pub use error::TtfbError;
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<outcome::TtfbOutcome, error::TtfbError> {
     Ok(TtfbOutcome::new(
         input,
         String::from("127.0.0.1"),

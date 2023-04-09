@@ -22,36 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#![deny(
-    clippy::all,
-    clippy::cargo,
-    clippy::nursery,
-    // clippy::restriction,
-    // clippy::pedantic
-)]
-// now allow a few rules which are denied by the above statement
-// --> they are ridiculous and not necessary
-#![allow(
-    clippy::suboptimal_flops,
-    clippy::redundant_pub_crate,
-    clippy::fallible_impl_from
-)]
-// I can't do anything about this; fault of the dependencies
-#![allow(clippy::multiple_crate_versions)]
-// allow: required because of derive macro.. :(
-#![allow(clippy::use_self)]
-// Not needed here. We only need this for the library!
-// #![deny(missing_docs)]
-#![deny(missing_debug_implementations)]
-#![deny(rustdoc::all)]
 
 use clap::Parser;
 use crossterm::style::{Attribute, SetAttribute};
 use crossterm::ExecutableCommand;
 use std::io::stdout;
 use std::process::exit;
-use ttfb::TtfbError;
-use ttfb::TtfbOutcome;
+
+use ttfb::imp;
 
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -91,17 +69,17 @@ fn main() {
     print_outcome(&ttfb).unwrap();
 }
 
-fn exit_error(err: TtfbError) -> ! {
+fn exit_error(err: imp::error::TtfbError) -> ! {
     eprint!("\u{1b}[31m");
     eprint!("\u{1b}[1m");
     eprint!("ERROR: ",);
     eprint!("\u{1b}[0m");
-    eprint!("{}", err);
+    //eprint!("{}", err);
     eprintln!();
     exit(-1)
 }
 
-fn print_outcome(ttfb: &TtfbOutcome) -> Result<(), String> {
+fn print_outcome(ttfb: &imp::outcome::TtfbOutcome) -> Result<(), String> {
     stdout()
         .execute(SetAttribute(Attribute::Bold))
         .map_err(|err| err.to_string())?;
@@ -114,15 +92,15 @@ fn print_outcome(ttfb: &TtfbOutcome) -> Result<(), String> {
     stdout()
         .execute(SetAttribute(Attribute::Reset))
         .map_err(|err| err.to_string())?;
-    if ttfb.dns_duration_rel().is_some() {
+    if ttfb.dns_duration_rel()>0 {
         print!(
             "{property:<14}: {rel_time:>13.3}   {abs_time:>13.3}",
             property = "DNS Lookup",
-            rel_time = ttfb.dns_duration_rel().unwrap().as_secs_f64() * 1000.0,
+            rel_time = ttfb.dns_duration_rel(),
             // for DNS abs and rel time is the same (because it happens first)
-            abs_time = ttfb.dns_duration_rel().unwrap().as_secs_f64() * 1000.0,
+            abs_time = ttfb.dns_duration_rel(),
         );
-        if ttfb.dns_duration_rel().unwrap().as_millis() < 2 {
+        if ttfb.dns_duration_rel() < 2 {
             print!("  (probably cached)");
         }
         println!();
@@ -130,33 +108,30 @@ fn print_outcome(ttfb: &TtfbOutcome) -> Result<(), String> {
     println!(
         "{property:<14}: {rel_time:>13.3}   {abs_time:>13.3}",
         property = "TCP connect",
-        rel_time = ttfb.tcp_connect_duration_rel().as_secs_f64() * 1000.0,
-        abs_time = ttfb.tcp_connect_duration_abs().as_secs_f64() * 1000.0,
+        rel_time = ttfb.tcp_connect_duration_rel(),
+        abs_time = ttfb.tcp_connect_duration_abs(),
     );
-    if ttfb.tls_handshake_duration_rel().is_some() {
+    if ttfb.tls_handshake_duration_rel()>0 {
         println!(
             "{property:<14}: {rel_time:>13.3}   {abs_time:>13.3}",
             property = "TLS Handshake",
-            rel_time = ttfb.tls_handshake_duration_rel().unwrap().as_secs_f64() * 1000.0,
+            rel_time = ttfb.tls_handshake_duration_rel(),
             // for DNS abs and rel time is the same (because it happens first)
-            abs_time = ttfb.tls_handshake_duration_abs().unwrap().as_secs_f64() * 1000.0,
+            abs_time = ttfb.tls_handshake_duration_abs(),
         );
     }
     println!(
         "{property:<14}: {rel_time:>13.3}   {abs_time:>13.3}",
         property = "HTTP GET Req",
-        rel_time = ttfb.http_get_send_duration_rel().as_secs_f64() * 1000.0,
-        abs_time = ttfb.http_get_send_duration_abs().as_secs_f64() * 1000.0,
+        rel_time = ttfb.http_get_send_duration_rel(),
+        abs_time = ttfb.http_get_send_duration_abs(),
     );
 
-    stdout()
-        .execute(SetAttribute(Attribute::Bold))
-        .map_err(|err| err.to_string())?;
     println!(
         "{property:<14}: {rel_time:>13.3}   {abs_time:>13.3}",
         property = "HTTP Resp TTFB",
-        rel_time = ttfb.http_ttfb_duration_rel().as_secs_f64() * 1000.0,
-        abs_time = ttfb.http_ttfb_duration_abs().as_secs_f64() * 1000.0,
+        rel_time = ttfb.http_ttfb_duration_rel(),
+        abs_time = ttfb.http_ttfb_duration_abs(),
     );
     stdout()
         .execute(SetAttribute(Attribute::Reset))
