@@ -24,28 +24,10 @@ SOFTWARE.
 
 use crate::error::TtfbError;
 use crate::outcome::TtfbOutcome;
+use wasm_bindgen::prelude::*;
 
-/// Takes a URL and connects to it via http/1.1. Measures time for
-/// DNS lookup, TCP connection start, TLS handshake, and TTFB (Time to First Byte)
-/// of HTML content.
-///
-/// ## Parameters
-/// - `input`: Url. Can be one of
-///   - `phip1611.de` (defaults to `http://`)
-///   - `http://phip1611.de`
-///   - `https://phip1611.de`
-///   - `https://phip1611.de?foo=bar`
-///   - `https://sub.domain.phip1611.de?foo=bar`
-///   - `http://12.34.56.78/foobar`
-///   - `https://1.1.1.1`
-///   - `12.34.56.78/foobar` (defaults to `http://`)
-///   - `12.34.56.78` (defaults to `http://`)
-/// - `allow_insecure_certificates`: if illegal certificates (untrusted, expired) should be accepted
-///                                  when https is used. Similar to `-k/--insecure` in `curl`.
-///
-/// ## Return value
-/// [`TtfbOutcome`] or [`TtfbError`].
 pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+    let window = web_sys::window().expect("should have a window in this context");
     Ok(TtfbOutcome::new(
         input,
         String::from("127.0.0.1"),

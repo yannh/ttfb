@@ -28,8 +28,9 @@ cfg-if = "1"
 derive_more = { version = "0.99", default-features = false, features = ["display"] }
 
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
-wasm-bindgen = { version = "0.2.62", default-features = false, optional = true }
+wasm-bindgen = { version = "0.2"}
 js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", features = ["Window", "Performance", "PerformanceTiming"] }
 
 [target.'cfg(not(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown")))'.dependencies]
 # +++ LIBRARY +++

@@ -53,11 +53,9 @@ SOFTWARE.
 #![deny(rustdoc::all)]
 // #![allow(rustdoc::missing_doc_code_examples)]
 
-
-
 pub mod error;
 pub mod outcome;
-use crate::error::{InvalidUrlError, ResolveDnsError, TtfbError};
+use crate::error::TtfbError;
 use crate::outcome::TtfbOutcome;
 
 #[macro_use]

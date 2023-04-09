@@ -29,7 +29,6 @@ use crossterm::ExecutableCommand;
 use std::io::stdout;
 use std::process::exit;
 
-
 use ttfb::error::TtfbError;
 use ttfb::outcome::TtfbOutcome;
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
