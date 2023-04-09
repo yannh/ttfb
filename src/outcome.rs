@@ -23,29 +23,26 @@ SOFTWARE.
 */
 //! Module for [`TtfbOutcome`].
 
-use std::net::IpAddr;
-use std::time::Duration;
-
 /// The final result of this library. It contains all the measured timings.
 #[derive(Debug)]
 pub struct TtfbOutcome {
     /// Copy of the user input.
     user_input: String,
     /// The used IP address (resolved by DNS).
-    ip_addr: IpAddr,
+    ip_addr: String,
     /// The port.
     port: u16,
     /// If DNS was required, the relative duration of this operation.
-    dns_duration_rel: Option<Duration>,
+    dns_duration_rel: u32,
     /// Relative duration of the TCP connection start.
-    tcp_connect_duration_rel: Duration,
+    tcp_connect_duration_rel: u32,
     /// If https is used, the relative duration of the TLS handshake.
-    tls_handshake_duration_rel: Option<Duration>,
+    tls_handshake_duration_rel: u32,
     /// The relative duration of the HTTP GET request sending.
-    http_get_send_duration_rel: Duration,
+    http_get_send_duration_rel: u32,
     /// The relative duration until the first byte from the HTTP response (the header) was
     /// received.
-    http_ttfb_duration_rel: Duration,
+    http_ttfb_duration_rel: u32,
     // http_content_download_duration: Duration,
 }
 
@@ -53,13 +50,13 @@ impl TtfbOutcome {
     #[allow(clippy::too_many_arguments)]
     pub(crate) const fn new(
         user_input: String,
-        ip_addr: IpAddr,
+        ip_addr: String,
         port: u16,
-        dns_duration_rel: Option<Duration>,
-        tcp_connect_duration_rel: Duration,
-        tls_handshake_duration_rel: Option<Duration>,
-        http_get_send_duration_rel: Duration,
-        http_ttfb_duration_rel: Duration,
+        dns_duration_rel: u32,
+        tcp_connect_duration_rel: u32,
+        tls_handshake_duration_rel: u32,
+        http_get_send_duration_rel: u32,
+        http_ttfb_duration_rel: u32,
         // http_content_download_duration: Duration,
     ) -> Self {
         Self {
@@ -81,8 +78,8 @@ impl TtfbOutcome {
     }
 
     /// Getter for [`Self::ip_addr`] (relative time).
-    pub const fn ip_addr(&self) -> IpAddr {
-        self.ip_addr
+    pub fn ip_addr(&self) -> &str {
+        &self.ip_addr
     }
 
     /// Getter for [`Self::port`] (relative time).
@@ -91,55 +88,52 @@ impl TtfbOutcome {
     }
 
     /// Getter for [`Self::dns_duration_rel`] (relative time).
-    pub const fn dns_duration_rel(&self) -> Option<&Duration> {
-        self.dns_duration_rel.as_ref()
+    pub const fn dns_duration_rel(&self) -> u32 {
+        self.dns_duration_rel
     }
 
     /// Getter for [`Self::tcp_connect_duration_rel`] (relative time).
-    pub const fn tcp_connect_duration_rel(&self) -> Duration {
+    pub const fn tcp_connect_duration_rel(&self) -> u32 {
         self.tcp_connect_duration_rel
     }
 
     /// Getter for [`Self::tls_handshake_duration_rel`] (relative time).
-    pub const fn tls_handshake_duration_rel(&self) -> Option<&Duration> {
-        self.tls_handshake_duration_rel.as_ref()
+    pub const fn tls_handshake_duration_rel(&self) -> u32 {
+        self.tls_handshake_duration_rel
     }
 
     /// Getter for [`Self::http_get_send_duration_rel`] (relative time).
-    pub const fn http_get_send_duration_rel(&self) -> Duration {
+    pub const fn http_get_send_duration_rel(&self) -> u32 {
         self.http_get_send_duration_rel
     }
 
     /// Getter for [`Self::http_ttfb_duration_rel`] (relative time).
-    pub const fn http_ttfb_duration_rel(&self) -> Duration {
+    pub const fn http_ttfb_duration_rel(&self) -> u32 {
         self.http_ttfb_duration_rel
     }
 
     /// Getter for the absolute duration from the beginning to the TCP connect.
     /// Calculated by the relative TCP connect time + DNS relative times.
-    pub fn tcp_connect_duration_abs(&self) -> Duration {
+    pub fn tcp_connect_duration_abs(&self) -> u32 {
         self.dns_duration_rel
-            .unwrap_or_else(|| Duration::from_secs(0))
             + self.tcp_connect_duration_rel
     }
     /// Getter for the absolute duration from the beginning to the TLS handshake.
     /// Calculated by the relative TLS handshake time + all previous relative times.
-    pub fn tls_handshake_duration_abs(&self) -> Option<Duration> {
+    pub fn tls_handshake_duration_abs(&self) -> u32 {
         self.tls_handshake_duration_rel
-            .map(|d| d + self.tcp_connect_duration_abs())
     }
 
     /// Getter for the absolute duration from the beginning to the HTTP GET send.
     /// Calculated by the relative HTTP GET send time + all previous relative times.
-    pub fn http_get_send_duration_abs(&self) -> Duration {
+    pub fn http_get_send_duration_abs(&self) -> u32 {
         self.tls_handshake_duration_abs()
-            .unwrap_or_else(|| self.tcp_connect_duration_abs())
             + self.http_get_send_duration_rel
     }
 
     /// Getter for the absolute duration from the beginning to the TTFB.
     /// Calculated by the relative TTFB time + all previous relative times.
-    pub fn http_ttfb_duration_abs(&self) -> Duration {
+    pub fn http_ttfb_duration_abs(&self) -> u32 {
         self.http_ttfb_duration_rel + self.http_get_send_duration_abs()
     }
 
@@ -158,7 +152,7 @@ mod tests {
     fn test_outcome() {
         let outcome = TtfbOutcome::new(
             "https://phip1611.de".to_string(),
-            IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
+            IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)).to_string(),
             443,
             Some(Duration::from_millis(1)),
             Duration::from_millis(2),

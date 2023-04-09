@@ -119,13 +119,13 @@ pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutc
 
     Ok(TtfbOutcome::new(
         input,
-        addr,
+        addr.to_string(),
         port,
-        dns_duration,
-        tcp_connect_duration,
-        tls_handshake_duration,
-        http_get_send_duration,
-        http_ttfb_duration,
+        u32::try_from(dns_duration.unwrap().as_millis()).unwrap(),
+        u32::try_from(tcp_connect_duration.as_millis()).unwrap(),
+        u32::try_from(tls_handshake_duration.unwrap().as_millis()).unwrap(),
+        u32::try_from(http_get_send_duration.as_millis()).unwrap(),
+        u32::try_from(http_ttfb_duration.as_millis()).unwrap(),
         // http_content_download_duration,
     ))
 }
