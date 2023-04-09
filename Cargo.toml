@@ -25,9 +25,13 @@ required-features = ["bin"]
 [features]
 bin = ["clap", "crossterm"]
 
-[dependencies]
-# +++ LIBRARY +++
 
+[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
+wasm-bindgen = { version = "0.2.62", default-features = false, optional = true }
+js-sys = { version = "0.3", optional = true }
+
+[target.'cfg(not(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown")))'.dependencies]
+# +++ LIBRARY +++
 # DNS over systems default DNS resolver
 trust-dns-resolver = { version = "0.22", features = ["dns-over-rustls"] }
 # TLS handshake
@@ -37,6 +41,10 @@ derive_more = { version = "0.99", default-features = false, features = ["display
 # nice abstraction of URL
 url = "2.2"
 regex = "1.5"
+# Platform-specific includes
+cfg-if = "1"
+
+
 
 # +++ BINARY +++
 # used for the binary, not the lib
@@ -59,3 +67,6 @@ features = [
     "unicode",
     "wrap_help"
 ]
+
+[lib]
+crate-type = ["cdylib", "rlib"]

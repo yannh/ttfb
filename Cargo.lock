@@ -1087,13 +1087,16 @@ dependencies = [
 name = "ttfb"
 version = "1.6.0"
 dependencies = [
+ "cfg-if",
  "clap",
  "crossterm",
  "derive_more",
+ "js-sys",
  "native-tls",
  "regex",
  "trust-dns-resolver",
  "url",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -22,64 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//! Library + CLI-Tool to measure the TTFB (time to first byte) of HTTP(S) requests.
-//! Additionally, this crate measures the times of DNS lookup, TCP connect, and
-//! TLS handshake. This crate currently only supports HTTP/1.1. It can cope with
-//! TLS 1.2 and 1.3.LICENSE.
-//!
-//! See [`ttfb`] which is the main function of the public interface.
-//!
-//! ## Cross Platform
-//! CLI + lib work on Linux, MacOS, and Windows.
-
-#![deny(
-    clippy::all,
-    clippy::cargo,
-    clippy::nursery,
-    // clippy::restriction,
-    // clippy::pedantic
-)]
-// now allow a few rules which are denied by the above statement
-// --> they are ridiculous and not necessary
-#![allow(
-    clippy::suboptimal_flops,
-    clippy::redundant_pub_crate,
-    clippy::fallible_impl_from
-)]
-// I can't do anything about this; fault of the dependencies
-#![allow(clippy::multiple_crate_versions)]
-// allow: required because of derive macro.. :(
-#![allow(clippy::use_self)]
-#![deny(missing_docs)]
-#![deny(missing_debug_implementations)]
-#![deny(rustdoc::all)]
-#![allow(rustdoc::missing_doc_code_examples)]
 
 pub use error::{InvalidUrlError, ResolveDnsError, TtfbError};
 pub use outcome::TtfbOutcome;
 
-use std::io::{Read as IoRead, Write as IoWrite};
+const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-mod error;
-mod outcome;
+trait IoReadAndWrite: IoWrite + IoRead {}
+
+impl<T: IoRead + IoWrite> IoReadAndWrite for T {}
 
 /// Common super trait for TCP-Stream or `TLS<TCP>`-Stream.
 trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
-
-#[macro_use]
-extern crate cfg_if;
-
-
-cfg_if! {
-    if #[cfg(all(feature = "js",
-      any(target_arch = "wasm32", target_arch = "wasm64"),
-      target_os = "unknown"))] {
-        #[path = "util_wasm32.rs"] mod imp;
-    } else {
-      #[path = "util.rs"] mod imp;
-    }
-}
-
 
 /// Takes a URL and connects to it via http/1.1. Measures time for
 /// DNS lookup, TCP connection start, TLS handshake, and TTFB (Time to First Byte)
@@ -101,6 +55,16 @@ cfg_if! {
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<imp::TtfbOutcome, imp::TtfbError> {
-    return imp::ttfb(input, allow_insecure_certificates);
+pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+    Ok(TtfbOutcome::new(
+        input,
+        addr,
+        port,
+        dns_duration,
+        tcp_connect_duration,
+        tls_handshake_duration,
+        http_get_send_duration,
+        http_ttfb_duration,
+        // http_content_download_duration,
+    ))
 }
