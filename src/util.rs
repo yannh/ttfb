@@ -67,7 +67,6 @@ use std::time::{Duration, Instant};
 use trust_dns_resolver::Resolver as DnsResolver;
 use url::Url;
 
-
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 trait IoReadAndWrite: IoWrite + IoRead {}
@@ -97,7 +96,7 @@ trait TcpWithMaybeTlsStream: IoWrite + IoRead {}
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+pub async fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     if input.is_empty() {
         return Err(TtfbError::InvalidUrl(InvalidUrlError::MissingInput));
     }

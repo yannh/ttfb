@@ -55,6 +55,7 @@ SOFTWARE.
 
 pub mod error;
 pub mod outcome;
+
 use crate::error::TtfbError;
 use crate::outcome::TtfbOutcome;
 
@@ -91,6 +92,6 @@ cfg_if! {
 ///
 /// ## Return value
 /// [`TtfbOutcome`] or [`TtfbError`].
-pub fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
-    return imp::ttfb(input, allow_insecure_certificates);
+pub async fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+    return Ok(imp::ttfb(input, allow_insecure_certificates).await.unwrap());
 }

@@ -30,7 +30,10 @@ derive_more = { version = "0.99", default-features = false, features = ["display
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
 wasm-bindgen = { version = "0.2"}
 js-sys = { version = "0.3", optional = true }
-web-sys = { version = "0.3", features = ["Window", "Performance", "PerformanceTiming"] }
+web-sys = { version = "0.3", features = ["Window", "Performance", "PerformanceTiming", "Headers", "Request", "RequestInit", "RequestMode", "Response",] }
+wasm-bindgen-futures = "0.4.34"
+
+
 
 [target.'cfg(not(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown")))'.dependencies]
 # +++ LIBRARY +++
@@ -42,6 +45,7 @@ native-tls = "0.2"
 url = "2.2"
 regex = "1.5"
 crossterm = { version = "0.25" }
+futures = "0.3"
 clap = { version = "~4.1", features = [
     "std",
     "color",

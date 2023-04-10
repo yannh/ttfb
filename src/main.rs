@@ -32,6 +32,7 @@ use std::process::exit;
 use ttfb::error::TtfbError;
 use ttfb::outcome::TtfbOutcome;
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+use futures::executor;
 
 macro_rules! unwrap_or_exit {
     ($ident:ident) => {
@@ -64,7 +65,7 @@ struct TtfbArgs {
 /// Small CLI binary wrapper around the [`ttfb`] lib.
 fn main() {
     let input: TtfbArgs = TtfbArgs::parse();
-    let res = ttfb::ttfb(input.host, input.allow_insecure_certificates);
+    let res = executor::block_on(ttfb::ttfb(input.host, input.allow_insecure_certificates));
     let ttfb = unwrap_or_exit!(res);
     print_outcome(&ttfb).unwrap();
 }

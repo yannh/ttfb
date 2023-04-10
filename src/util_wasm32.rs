@@ -29,7 +29,7 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 
 
-pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
+pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     let window = web_sys::window().expect("should have a window in this context");
     let mut opts = RequestInit::new();
     opts.method("GET");
@@ -40,7 +40,7 @@ pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOut
     let request:Request = Request::new_with_str_and_init(&url, &opts).unwrap();
 
     let window = web_sys::window().unwrap();
-    let resp_value = window.fetch_with_request(&request);
+    let resp_value = JsFuture::from(window.fetch_with_request(&request)).await.unwrap();
 
     // `resp_value` is a `Response` object.
     assert!(resp_value.is_instance_of::<Response>());
