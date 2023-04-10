@@ -25,9 +25,34 @@ SOFTWARE.
 use crate::error::TtfbError;
 use crate::outcome::TtfbOutcome;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::JsFuture;
+use web_sys::{Request, RequestInit, RequestMode, Response};
+
 
 pub fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     let window = web_sys::window().expect("should have a window in this context");
+    let mut opts = RequestInit::new();
+    opts.method("GET");
+    opts.mode(RequestMode::Cors);
+
+    let url = format!("https://api.github.com/repos/{}/branches/master", "foo");
+
+    let request:Request = Request::new_with_str_and_init(&url, &opts).unwrap();
+
+    let window = web_sys::window().unwrap();
+    let resp_value = window.fetch_with_request(&request);
+
+    // `resp_value` is a `Response` object.
+    assert!(resp_value.is_instance_of::<Response>());
+    let resp: Response = resp_value.dyn_into().unwrap();
+
+    let performance = window
+        .performance()
+        .expect("performance should be available");
+
+    // Convert this other `Promise` into a rust `Future`.
+    let json = resp.json();
+
     Ok(TtfbOutcome::new(
         input,
         String::from("127.0.0.1"),
