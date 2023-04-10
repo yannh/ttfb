@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use serde::{Deserialize, Serialize};
 use crate::error::TtfbError;
 use crate::outcome::TtfbOutcome;
 use wasm_bindgen::prelude::*;
@@ -42,6 +43,14 @@ fn run() {
     log("pouet");
 }
 
+
+#[wasm_bindgen]
+pub async fn ttfb_js(input: String, allow_insecure_certificates: bool) -> Result<JsValue, JsValue> {
+    match ttfb(input, allow_insecure_certificates).await {
+        Ok(res) => return Ok(JsValue::from_serde(&res).unwrap()),
+        Err(e) => return Err(JsValue::from(&*format!("error retrieving"))),
+    };
+}
 
 pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     let window = web_sys::window().expect("should have a window in this context");

@@ -22,9 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //! Module for [`TtfbOutcome`].
+use serde::{Deserialize, Serialize};
 
 /// The final result of this library. It contains all the measured timings.
-#[derive(Debug)]
+#[derive(Debug,  Serialize, Deserialize)]
 pub struct TtfbOutcome {
     /// Copy of the user input.
     user_input: String,
