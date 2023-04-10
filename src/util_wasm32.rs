@@ -38,18 +38,16 @@ extern "C" {
 }
 
 
-#[wasm_bindgen(start)]
-fn run() {
-    log("pouet");
-}
-
-
 #[wasm_bindgen]
 pub async fn ttfb_js(input: String, allow_insecure_certificates: bool) -> Result<JsValue, JsValue> {
     match ttfb(input, allow_insecure_certificates).await {
         Ok(res) => return Ok(JsValue::from_serde(&res).unwrap()),
         Err(e) => return Err(JsValue::from(&*format!("error retrieving"))),
     };
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Resource {
+    pub name: String,
 }
 
 pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
@@ -73,12 +71,18 @@ pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<T
         .performance()
         .expect("performance should be available");
 
+    let resources = performance.get_entries_by_type("resource");
+    let mut a: String = "".to_string();
+    let mut c: String = "".to_string();
+    for item in resources.iter() {
+        log("BAR\n")
+    }
     // Convert this other `Promise` into a rust `Future`.
     let json = resp.json();
 
     Ok(TtfbOutcome::new(
-        input,
-        String::from("127.0.0.1"),
+        "foo".to_string(),
+        a,
         66,
         100,
         10,

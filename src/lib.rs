@@ -55,7 +55,6 @@ SOFTWARE.
 
 pub mod error;
 pub mod outcome;
-
 use crate::error::TtfbError;
 use crate::outcome::TtfbOutcome;
 
