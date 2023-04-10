@@ -95,3 +95,4 @@ cfg_if! {
 pub async fn ttfb(input: String, allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     return Ok(imp::ttfb(input, allow_insecure_certificates).await.unwrap());
 }
+

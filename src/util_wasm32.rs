@@ -28,13 +28,27 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
+
+#[wasm_bindgen(start)]
+fn run() {
+    log("pouet");
+}
+
 
 pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
     let window = web_sys::window().expect("should have a window in this context");
     let mut opts = RequestInit::new();
     opts.method("GET");
     opts.mode(RequestMode::Cors);
-
+    log("foo");
     let url = format!("https://api.github.com/repos/{}/branches/master", "foo");
 
     let request:Request = Request::new_with_str_and_init(&url, &opts).unwrap();
