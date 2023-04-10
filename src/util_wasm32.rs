@@ -48,6 +48,8 @@ pub async fn ttfb_js(input: String, allow_insecure_certificates: bool) -> Result
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Resource {
     pub name: String,
+    pub domainLookupStart: u64,
+    pub domainLookupEnd: u64,
 }
 
 pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<TtfbOutcome, TtfbError> {
@@ -73,9 +75,10 @@ pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<T
 
     let resources = performance.get_entries_by_type("resource");
     let mut a: String = "".to_string();
-    let mut c: String = "".to_string();
     for item in resources.iter() {
-        log("BAR\n")
+        let b: Resource = serde_wasm_bindgen::from_value(item).unwrap();
+        let c = serde_json::to_string(&b).unwrap();
+        a.push_str(c.as_str());
     }
     // Convert this other `Promise` into a rust `Future`.
     let json = resp.json();
