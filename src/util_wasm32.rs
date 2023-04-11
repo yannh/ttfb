@@ -48,14 +48,7 @@ pub async fn ttfb_js(input: String, allow_insecure_certificates: bool) -> Result
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Resource {
     pub name: String,
-    pub domainLookupStart: u64,
-    pub domainLookupEnd: u64,
 }
-
-pub fn foo () {
-    log("BAAAAAHHHH\n")
-}
-
 
 #[wasm_bindgen]
 pub fn sleep(ms: i32) -> js_sys::Promise {
@@ -71,7 +64,6 @@ pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<T
     let mut opts = RequestInit::new();
     opts.method("GET");
     opts.mode(RequestMode::Cors);
-    log("foo");
     let url = format!("https://yann.mandragor.org/");
 
     let request:Request = Request::new_with_str_and_init(&url, &opts).unwrap();
@@ -88,18 +80,20 @@ pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<T
         .performance()
         .expect("performance should be available");
 
-    JsFuture::from(sleep(1500)).await;
+    // FF - needs a few ms for the result to be available in performance api
+    JsFuture::from(sleep(500)).await;
 
     let resources = performance.get_entries_by_type("resource");
     let mut a: String = "".to_string();
     let mut res: Resource = Resource{
         name: "".to_string(),
-        domainLookupStart: 0,
-        domainLookupEnd: 0,
     };
     for item in resources.iter() {
+        log("foobar");
         let b: Resource = serde_wasm_bindgen::from_value(item).unwrap();
-        log (b.name.as_str());
+        log("foobar2");
+        let c = serde_json::to_string(&b).unwrap();
+        log("foobar3");
         if b.name == url {
             res = b.clone();
             break
@@ -112,11 +106,10 @@ pub async fn ttfb(input: String, _allow_insecure_certificates: bool) -> Result<T
         "foo".to_string(),
         c,
         66,
-        100,
-        10,
-        100,
-        100,
-        100,
-        // http_content_download_duration,
+        0,
+        0,
+        0,
+        0,
+        0,
     ))
 }
